@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
+use App\Http\Resources\ProjectResource;
 
 class ProjectController extends Controller
 {
@@ -12,9 +13,29 @@ class ProjectController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        //
+{
+    $query = Project::query();
+
+    if(request("name")){
+        $query->where("name","like", "%".request("name"). "%");
     }
+
+    if (request("status")){
+        $query->where("status", request("status"));
+    }
+
+    
+    $projects = $query->paginate(10);
+
+    
+    return inertia("Project/Index", [
+
+
+        'projects' => ProjectResource::collection($projects),
+        'queryParams' => request()->query() ?: null,
+    ]);
+}
+
 
     /**
      * Show the form for creating a new resource.
