@@ -7,9 +7,10 @@ import {
 } from "@/constants.jsx";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
-import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { FaEdit, FaTrashAlt, FaChevronUp, FaChevronDown } from "react-icons/fa";
 
 import React from "react";
+import TableHeading from "@/Components/TableHeading";
 
 export default function index({ auth, projects, queryParams = null }) {
     queryParams = queryParams || {};
@@ -18,6 +19,21 @@ export default function index({ auth, projects, queryParams = null }) {
             queryParams[name] = value;
         } else {
             delete queryParams[name];
+        }
+
+        router.get(route("project.index"), queryParams);
+    };
+
+    const sortChanged = (name) => {
+        if (name === queryParams.sort_field) {
+            if (queryParams.sort_direction === "asc") {
+                queryParams.sort_direction = "desc";
+            } else {
+                queryParams.sort_direction = "asc";
+            }
+        } else {
+            queryParams.sort_field = name;
+            queryParams.sort_direction = "asc";
         }
 
         router.get(route("project.index"), queryParams);
@@ -83,7 +99,7 @@ export default function index({ auth, projects, queryParams = null }) {
                             >
                                 <option value="">Select Status</option>
                                 <option value="pending">Pending</option>
-                                <option value="in_progress" >In Progress</option>
+                                <option value="in_progress">In Progress</option>
                                 <option value="completed">Completed</option>
                             </SelectInput>
                             <div className="absolute right-3 top-2 pointer-events-none">
@@ -105,113 +121,143 @@ export default function index({ auth, projects, queryParams = null }) {
                         </div>
                     </div>
 
-                  
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
-                            <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                                <thead className="text-xs text-white-700 uppercase bg-gray-100 dark:bg-gray-700">
-                                    <tr>
-                                        <th className="px-6 py-4 font-semibold text-left">
+                            <div className="overflow-auto">
+                                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                    <thead className="text-xs text-white-700 uppercase bg-gray-100 dark:bg-gray-700">
+                                        <tr>
+                                           <TableHeading 
+                                           name="id"
+                                           sort_field={queryParams.sort_field}
+                                            sort_direction={queryParams.sort_direction}
+                                            sortChanged ={sortChanged}
+                                            >
                                             ID
-                                        </th>
-                                        <th className="px-6 py-4 font-semibold text-left">
-                                            Image
-                                        </th>
-                                        <th className="px-6 py-4 font-semibold text-left">
+                                           </TableHeading>
+                                            <th className="px-6 py-4 font-semibold text-left">
+                                                Image
+                                            </th>
+                                         
+                                                 <TableHeading 
+                                           name="name"
+                                           sort_field={queryParams.sort_field}
+                                            sort_direction={queryParams.sort_direction}
+                                            sortChanged ={sortChanged}
+                                            >
                                             Name
-                                        </th>
-                                        <th className="px-6 py-4 font-semibold text-left">
+                                           </TableHeading>
+                                            
+                                           <TableHeading 
+                                           name="status"
+                                           sort_field={queryParams.sort_field}
+                                            sort_direction={queryParams.sort_direction}
+                                            sortChanged ={sortChanged}
+                                            >
                                             Status
-                                        </th>
-                                        <th className="px-6 py-4 font-semibold text-left">
+                                           </TableHeading>
+
+                                           <TableHeading 
+                                           name="create_at"
+                                           sort_field={queryParams.sort_field}
+                                            sort_direction={queryParams.sort_direction}
+                                            sortChanged ={sortChanged}
+                                            className="text-nowrap"
+                                            >
                                             Create Date
-                                        </th>
-                                        <th className="px-6 py-4 font-semibold text-left">
+                                           </TableHeading>
+                                           <TableHeading 
+                                           name="due_date"
+                                           sort_field={queryParams.sort_field}
+                                            sort_direction={queryParams.sort_direction}
+                                            sortChanged ={sortChanged}
+                                            className="text-nowrap"
+                                            >
                                             Due Date
-                                        </th>
-                                        <th className="px-6 py-4 font-semibold text-left text-nowrap">
-                                            Created By
-                                        </th>
-                                        <th className="px-6 py-4 font-semibold text-right">
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white dark:bg-gray-800">
-                                    {projects.data.map((project) => (
-                                        <tr
-                                            className="hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700"
-                                            key={project.id}
-                                        >
-                                           
-                                            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                                                {project.id}
-                                            </td>
-
-                                         
-                                            <td className="px-6 py-4">
-                                            <img
-                                                    src={project.image_path}
-                                                    style={{ width: 60 }}
-                                                    alt={project.name}
-                                                />
-                                            </td>
-
-                                            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                                                {project.name}
-                                            </td>
-
-                                        
-                                            <td className="px-6 py-4">
-                                                <span
-                                                    className={`px-2 py-1 rounded-full text-white font-semibold whitespace-nowrap ${
-                                                        PROJECT_STATUS_CLASS_MAP[
-                                                            project.status
-                                                        ] || "bg-gray-500"
-                                                    }`}
-                                                >
-                                                    {
-                                                        PROJECT_STATUS_TEXT_MAP[
-                                                            project.status
-                                                        ]
-                                                    }
-                                                </span>
-                                            </td>
-
-                                         
-                                            <td className="px-6 py-4 text-gray-900 dark:text-white text-nowrap">
-                                                {project.created_at}
-                                            </td>
-
-                                           
-                                            <td className="px-6 py-4 text-gray-900 dark:text-white text-nowrap">
-                                                {project.due_date}
-                                            </td>
-
-                                         
-                                            <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                                                {project.createdBy.name}
-                                            </td>
-
-                                            <td className="px-6 py-4 text-right flex justify-end items-center">
-    <Link
-        href={route("project.edit", project.id)}
-        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-600"
-    >
-        <FaEdit className="inline-block w-5 h-5" />
-    </Link>
-    <Link
-        href={route("project.destroy", project.id)}
-        className="ml-4 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-600"
-    >
-        <FaTrashAlt className="inline-block w-5 h-5" />
-    </Link>
-</td>
-
+                                           </TableHeading>
+                                            <th className="px-6 py-4 font-semibold text-left text-nowrap">
+                                                Created By
+                                            </th>
+                                            <th className="px-6 py-4 font-semibold text-right">
+                                                Actions
+                                            </th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody className="bg-white dark:bg-gray-800">
+                                        {projects.data.map((project) => (
+                                            <tr
+                                                className="hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700"
+                                                key={project.id}
+                                            >
+                                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                                    {project.id}
+                                                </td>
+
+                                                <td className="px-6 py-4">
+                                                    <img
+                                                        src={project.image_path}
+                                                        style={{ width: 60 }}
+                                                        alt={project.name}
+                                                    />
+                                                </td>
+
+                                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                                    {project.name}
+                                                </td>
+
+                                                <td className="px-6 py-4">
+                                                    <span
+                                                        className={`px-2 py-1 rounded-full text-white font-semibold whitespace-nowrap ${
+                                                            PROJECT_STATUS_CLASS_MAP[
+                                                                project.status
+                                                            ] || "bg-gray-500"
+                                                        }`}
+                                                    >
+                                                        {
+                                                            PROJECT_STATUS_TEXT_MAP[
+                                                                project.status
+                                                            ]
+                                                        }
+                                                    </span>
+                                                </td>
+
+                                                <td className="px-6 py-4 text-gray-900 dark:text-white text-nowrap">
+                                                    {project.created_at}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-gray-900 dark:text-white text-nowrap">
+                                                    {project.due_date}
+                                                </td>
+
+                                                <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                                    {project.createdBy.name}
+                                                </td>
+
+                                                <td className="px-6 py-4 text-right flex justify-end items-center">
+                                                    <Link
+                                                        href={route(
+                                                            "project.edit",
+                                                            project.id
+                                                        )}
+                                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-600"
+                                                    >
+                                                        <FaEdit className="inline-block w-5 h-5" />
+                                                    </Link>
+                                                    <Link
+                                                        href={route(
+                                                            "project.destroy",
+                                                            project.id
+                                                        )}
+                                                        className="ml-4 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-600"
+                                                    >
+                                                        <FaTrashAlt className="inline-block w-5 h-5" />
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                             <Pagination links={projects.meta.links} />
                         </div>
                     </div>
